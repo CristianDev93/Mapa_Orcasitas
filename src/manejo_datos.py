@@ -1,62 +1,46 @@
-import json
-import tkinter as tk
-from shapely.geometry import shape, mapping
-from shapely.ops import transform
-from tkinter import filedialog
-import fiona
+import matplotlib.pyplot as plt
+import base64
+import matplotlib.pyplot as plt
+from io import BytesIO 
+
 
 
 """Clase donde se definen metodós para realizar operaciones sobre los archivos"""
 class manejo_datos():
-    root = tk.Tk()
-    root.withdraw()
-
-    # TODO: función que seleccionando un geojson simplilfica las cordenadas, quitandole decimales para facililtar su manejo.
-    def redondear_coordenadas():
         
-        f = filedialog.askopenfilename()
+    #Metodo que crea un grafico y luego hace un buffer con una imagen base 64
+    def generar_grafico(irradiacion):
         
-        with open(f, "r") as file:
-            
-            dat = json.load(file)
+        meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+        fig, ax = plt.subplots()
+        ax.bar(meses, irradiacion)
+        ax.set_title('Radiación solar mensual (kWh/m²)')
+        ax.set_ylabel('Irradiación (KWh/m²)')
         
-        #Recorre el archivo quitando decimales a las cordenadas.
-        for feature in dat["features"]:
-            geom = feature["geometry"]
-            if geom["type"] == "Point":
-                geom["coordinates"] = [round(coord, 4) for coord in geom["coordinates"]]
-            elif geom["type"] in ["LineString", "MultiPoint"]:
-                geom["coordinates"] = [[round(coord, 4) for coord in point] for point in geom["coordinates"]]
-            elif geom["type"] == "Polygon":
-                geom["coordinates"] = [[[round(coord, 4) for coord in point] for point in ring] for ring in geom["coordinates"]]
-        nf = filedialog.asksaveasfilename(defaultextension= "Irradiacion_simpificado.geojson",)
+        buffer = BytesIO()
         
-        with open(nf , "w") as f:
-            json.dump(dat, f)
-            
-    # TODO: Función para  simplificar la geometria, elimina los puntos redundantes y vaja ala definición.
-    def simplificar_geo():
-
-        tolerancia = 0.01
-        f = filedialog.askopenfile()
-        nf = filedialog.asksaveasfilename(defaultextension= "Irradiacion_final.geojson",)
+        plt.savefig(buffer, format="png")
+        buffer.seek(0)
+        img_base64_ir = base64.b64encode(buffer.read()).decode("utf-8")
         
-        with fiona.open(f) as src:
-            with fiona.open(nf, "w", **src.meta) as dst:
-                for feature in src:
-                    geom = shape(feature["geometry"])
-                    simpli_geom = geom.simplify(tolerancia)
-                    feature["geometry"] = mapping(simpli_geom)
-                    dst.write(feature)
-    # TODO: Metodo que abre el dialogo del sistema para abrir un archivo 
-    def abrir_arch():
-        file = filedialog.askopenfile()
-        if file:
-            dat = json.load(file)
-            file.close()
-            return dat
-        else:
-            print("No se a seleccionado ningún archivo.") 
-            return None        
+        plt.close(fig)
         
+        return img_base64_ir
+    
+    #Metodo que crea un grafico y luego hace un buffer con una imagen base 64
+    def generar_gra_energia(potencia):
+        
+        meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+        fig, ax = plt.subplots()
+        ax.bar(meses, potencia)
+        ax.set_title('Producción mensual de energía fotovoltaica (kWh)')
+        ax.set_ylabel("Energia KWh")
+        
+        buffer = BytesIO()
+        plt.savefig(buffer, format = "png")
+        buffer.seek(0)
+        img_base64_ener = base64.b64encode(buffer.read()).decode("utf-8")
+        plt.close(fig)
+        
+        return img_base64_ener
         

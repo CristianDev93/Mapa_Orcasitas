@@ -1,44 +1,123 @@
+import html
+from bs4 import BeautifulSoup
+from .manejo_datos import manejo_datos as md
 
-"""En esta clase se declaran metodos que se utilizaran para dar color a las capas obtenidas de
-archivos geojson"""
+""""""
+
+
 class estilos:
-    
-    def __init__(self):
-        pass
-    # Metodo que da estilo segun la el nivel de radiacion solar anual.
-    def irradiacion(feature):
-        rad = feature["properties"]["Radiacion_KWh_m2_Anual"]
-        if rad < 250:
-            return {'fillColor': '#6B73FD', 'color': '#6B73FD', 'fillOpacity': 1.0}
-        elif rad < 500:
-            return {'fillColor': '#3ACEFE', 'color': '#3ACEFE', 'fillOpacity': 1.0}
-        elif rad < 750:
-            return {'fillColor': '#89F0CC', 'color': '#89F0CC', 'fillOpacity': 1.0}
-        elif rad < 1000:
-            return {'fillColor': '#B4FD77', 'color': '#B4FD77', 'fillOpacity': 1.0}
-        elif rad < 1250:
-            return {'fillColor': '#FFFF73', 'color': '#FFFF73', 'fillOpacity': 1.0}
-        elif rad < 1500:
-            return {'fillColor': '#F8DD1C', 'color': '#F8DD1C', 'fillOpacity': 1.0}
-        elif rad < 1750:
-            return {'fillColor': '#FF9A0B', 'color': '#FF9A0B', 'fillOpacity': 1.0}
-        elif rad < 2020:
-            return {'fillColor': '#FE230A', 'color': '#FE230A', 'fillOpacity': 1.0}
-        else:
-            return {'fillColor': '#FFFFFF', 'color': '#FFFFFF', 'fillOpacity': 1.0}
-    # Metodo que da color a los poligonos, segun la superficie disponible.  
+
+    # Metodo que da color a los poligonos, segun la superficie disponible.
+        
     def superficie(feature):
         """Aplica un estilo según la superficie disponible o datos de irradiación."""
         superficie = feature['properties'].get('Tejado_Disponible_m2', 0)
         if superficie in range(0, 21):
-            return {'fillColor': '#FFFFB2', 'color': '#FFFFB2', 'weight': 2, 'fillOpacity': 0.7}
+            return {'fillColor': '#FFFFB2', 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
         elif superficie in range(20, 81):
-            return {'fillColor': '#FECC5C', 'color': '#FECC5C', 'weight': 2, 'fillOpacity': 0.7}
+            return {'fillColor': '#FECC5C', 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
         elif superficie in range(80, 401):
-            return {'fillColor': '#FD8D3C', 'color': '#FD8D3C', 'weight': 2, 'fillOpacity': 0.7}
+            return {'fillColor': '#FD8D3C', 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
         elif superficie in range(400, 801):
-            return {'fillColor': '#F03B20', 'color': '#F03B20', 'weight': 2, 'fillOpacity': 0.7}
+            return {'fillColor': '#F03B20', 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
         elif superficie in range(800, 1604):
-            return {'fillColor': '#BD0026', 'color': '#BD0026', 'weight': 2, 'fillOpacity': 0.7}
+            return {'fillColor': '#BD0026', 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
         else:
-            return {'fillColor': '#FFFFFF', 'color': '#000000', 'weight': 2, 'fillOpacity': 0.7}
+            return {'fillColor': '#FFFFFF', 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
+
+    # Metodo que genera un texto HTML con datos de los edificios.
+    def crear_contenido_popup(feature):
+        """
+        Genera el estilo del pop up y añade contenido extraido del un GeoJson.
+        """
+        id = feature['id']
+        ref_catastral = feature['properties']['Referencia_Catastral']
+        uso = html.escape(feature['properties']['Uso'])
+        tejado_disp = feature['properties']['Tejado_Disponible_m2']
+        irradiacion = [feature["properties"]
+                       [f'Radiacion_kWh_m2_{i}'] for i in range(1, 13)]
+        energia = [feature["properties"]
+                   [f"Energia_KWh_{j}"] for j in range(1, 13)]
+        radiacion_Anual = [feature["properties"]['Radiacion_kWh_m2_Anual']]
+        energia_anual = [feature["properties"]["Energia_KWh_Anual"]]
+        img_base_i =  md.generar_grafico(irradiacion)
+        img_base_e = md.generar_gra_energia(energia)
+        html_popup = f"""
+        <link rel = "stylesheet" href= "./css/estilos_popup.css">
+        <div id="pop-up-{id}" data-id="{id}">
+            <div style="background-color: #194470;">
+                <h4 style="color: white;">Información del edificio</h4>
+            </div>
+            <b>Referencia catastral: </b> {ref_catastral}</br>
+            <b>Uso: </b> {uso} <br>
+            <b id = "tejado-sup-{id}">Tejado disponible:{tejado_disp}</b></br>
+            <b>Radiación kWh m2 Anual:</b> {radiacion_Anual}</br>
+            <b>Energía KWh Anual:</b> {energia_anual}</br>
+            <details>
+                <summary>Grafico irradiación kWh m2 mensula</summary>
+                <div>
+                    <img id="grafico" src="data:image/png;base64,{img_base_i}">
+                </div>
+            </details>
+            
+             <details>
+                <summary>Grafico energía KWh mensual</summary>
+                <div>
+                    <img id="grafico" src="data:image/png;base64,{img_base_e}">
+                </div>
+            </details>
+            
+            <details>
+                <summary>Calculadora de paneles</summary>
+                <div>
+                    <p>Introduce los datos para calcular el número de paneles necesarios:</p>
+                    <label><b>Consumo Anual (kWh):</b></label>
+                    <input type="number" id="consumo-anual-{id}" step="any" placeholder="Ej. 5000"><br>
+                    <b>Selecciona la potencia del panel:</b>
+                    <select id="potencia-panel-{id}">
+                        <option value="0.44">0.44 kW</option>
+                        <option value="0.49">0.49 kW</option>
+                        <option value="0.59">0.59 kW</option>
+                    </select><br>
+                    <button id="btn-calcular-{id}">Calcular</button>
+                    <p><b id="resultado-calculo-{id}" style="margin-top: 10px;">El numero de paneles es:</b></p>
+                    <p><b id="icono-estado-{id}"></b></p>
+                </div>
+            </details>
+        </div>
+        """
+
+        return html_popup
+
+    # Genera una cabezera para añadir al archivo html.
+    def generar_cabecera(pat_html):
+        """
+        Añade la cabecera al mapa ya creado.
+        Args: archivo HTML al cual se le añade el la cabecera. 
+        """
+        try:
+            with open(pat_html, 'r', encoding='utf-8') as file:
+                contenido = BeautifulSoup(file, 'html.parser')
+
+            cabezera_html = '''
+                <link rel = "stylesheet" href= "./css/estilos_header.css">
+            
+                <div id="header">
+                    <div>
+                       <img src="./logos/ciemat.png" alt="Logo CIEMAT" class="colaborador-logo">
+                        <img src="./logos/politecnica.png" alt="Logo Universidad politecnica" class="colaborador-logo">
+                        <img src="./logos/logo_canaveral.png" alt="Logo cañaveral" class="colaborador-logo">
+                    </div>
+                    <h1 class = "titulo">Mapa Comunidad solar en Orcasitas</h1>
+                    <script src ="./calcular_paneles.js" defer></script>
+                </div>
+            '''
+            body = contenido.find('body')
+            body.insert(0, BeautifulSoup(cabezera_html, 'html.parser'))
+
+            with open(pat_html, 'w', encoding='utf-8') as file:
+                file.write(str(contenido))
+
+        except FileNotFoundError:
+            print('El archivo HTML no existe.')
+    
