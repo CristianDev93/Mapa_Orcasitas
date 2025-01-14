@@ -13,17 +13,17 @@ class estilos:
         """Aplica un estilo según la superficie disponible o datos de irradiación."""
         superficie = feature['properties'].get('Tejado_Disponible_m2', 0)
         if superficie in range(0, 21):
-            return {'fillColor': '#FFFFB2', 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
+            return {'fillColor': '#FFFFB2', 'weight': 2, 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
         elif superficie in range(20, 81):
-            return {'fillColor': '#FECC5C', 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
+            return {'fillColor': '#FECC5C', 'weight': 2, 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
         elif superficie in range(80, 401):
-            return {'fillColor': '#FD8D3C', 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
+            return {'fillColor': '#FD8D3C', 'weight': 2, 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
         elif superficie in range(400, 801):
-            return {'fillColor': '#F03B20', 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
+            return {'fillColor': '#F03B20', 'weight': 2, 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
         elif superficie in range(800, 1604):
-            return {'fillColor': '#BD0026', 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
+            return {'fillColor': '#BD0026', 'weight': 2, 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
         else:
-            return {'fillColor': '#FFFFFF', 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
+            return {'fillColor': '#FFFFFF', 'weight': 2, 'color': '#000000', 'weight': 0.5, 'fillOpacity': 0.7}
 
     # Metodo que genera un texto HTML con datos de los edificios.
     def crear_contenido_popup(feature):
@@ -38,8 +38,8 @@ class estilos:
                        [f'Radiacion_kWh_m2_{i}'] for i in range(1, 13)]
         energia = [feature["properties"]
                    [f"Energia_KWh_{j}"] for j in range(1, 13)]
-        radiacion_Anual = [feature["properties"]['Radiacion_kWh_m2_Anual']]
-        energia_anual = [feature["properties"]["Energia_KWh_Anual"]]
+        radiacion_Anual = feature["properties"]['Radiacion_kWh_m2_Anual']
+        energia_anual = feature["properties"]["Energia_KWh_Anual"]
         img_base_i =  md.generar_grafico(irradiacion)
         img_base_e = md.generar_gra_energia(energia)
         html_popup = f"""
@@ -80,7 +80,7 @@ class estilos:
                         <option value="0.59">0.59 kW</option>
                     </select><br>
                     <button id="btn-calcular-{id}">Calcular</button>
-                    <p><b id="resultado-calculo-{id}" style="margin-top: 10px;">El numero de paneles es:</b></p>
+                    <p><b id="resultado-calculo-{id}" style="margin-top: 10px;"></b></p>
                     <p><b id="icono-estado-{id}"></b></p>
                 </div>
             </details>
@@ -108,7 +108,7 @@ class estilos:
                         <img src="./logos/politecnica.png" alt="Logo Universidad politecnica" class="colaborador-logo">
                         <img src="./logos/logo_canaveral.png" alt="Logo cañaveral" class="colaborador-logo">
                     </div>
-                    <h1 class = "titulo">Mapa Comunidad solar en Orcasitas</h1>
+                    <h1 class = "titulo">Comunidad Energética en Orcasitas</h1>
                     <script src ="./calcular_paneles.js" defer></script>
                 </div>
             '''

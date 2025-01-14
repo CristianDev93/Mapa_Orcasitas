@@ -1,0 +1,62 @@
+
+.foliumpopup{
+    width: 400px !important;
+    height: auto !important;
+    display: inline-block;
+    overflow: auto;
+    background-color: #f4f4f9;
+    font-size: 10px;
+    margin-right: 20px;
+    
+}
+
+#grafico {
+    width: 350px;
+    height: 250px;
+}
+details {
+    margin-bottom: 10px;
+}
+summary {
+    cursor: pointer;
+    font-weight: bold;
+}
+details summary::before {
+    content: '►'; 
+    margin-right: 5px; 
+    font-size: 18px; 
+    color: #000; 
+}
+details[open] summary::before {
+    content: '▼';  
+    margin-right: 5px; 
+    font-size: 18px; 
+    color: #000;
+}
+
+
+.leaflet-popup-close-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 18px;
+    color: #333 !important;
+    background: #FF0000 !important;
+    border: none;
+    padding: 2px 5px;
+    border-radius: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer; 
+}
+
+.leaflet-popup-close-button:hover {
+    background-color: #f4f4f9;
+    color: red;
+}
+
+@media (max-width: 2000px) {
+    #pop-up {
+        width: 200px;
+        height: 300px;
+    }
+}

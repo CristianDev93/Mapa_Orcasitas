@@ -55,7 +55,7 @@ class GeneradorMap:
         folium.TileLayer(
             tiles= "http://localhost:8000/datos/teselas_irradiacion_6_20/{z}/{x}/{y}.png",
             attr= "Irradiación solar CIEMAT",
-            name= "Irradiación solar anual CIEMAT",
+            name= "Irradiación solar anual",
             control= True,
             overlay= True,
             show= False,
@@ -64,7 +64,7 @@ class GeneradorMap:
         poligono = folium.GeoJson(
             data= datos,
             style_function= st.superficie,
-            name= "Superficie disponible m\u00B2",
+            name= "Superficie disponible m\u00B2 y datos de los edificios CIEMAT",
             show=True,
             control= True
         )
@@ -105,44 +105,44 @@ class GeneradorMap:
         leyenda_html = '''
                 <div style="
                 position: fixed; 
-                bottom: 50px; left: 50px; width: 320px; height: auto; 
+                bottom: 50px; left: 50px; width: 290px; height: auto; 
                 background-color: white; border:2px solid grey; z-index:9999; font-size:12px;
                 padding: 10px;">
                 <h4> Leyendas </h4>
                 
                 <details>
-                    <summary><b>Irradiación Solar CIEMAT</b></summary>
+                    <summary><b>Irradiación Solar</b></summary>
                     <div style="margin-bottom: 5px;">
                         <i style="background:#FE230A; width: 20px; height: 20px; float: left; margin-right: 8px;"></i>
-                        1.750 - 2.020<br>
+                        1.750 - 2.020 kWh m²<br>
                     </div>
                     <div style="margin-bottom: 5px;">
                         <i style="background:#FF9A0B; width: 20px; height: 20px; float: left; margin-right: 8px;"></i>
-                        1.500 - 1.750<br>
+                        1.500 - 1.750 kWh m²<br>
                     </div>
                     <div style="margin-bottom: 5px;">
                         <i style="background:#F8DD1C; width: 20px; height: 20px; float: left; margin-right: 8px;"></i>
-                        1.250 - 1.500<br>
+                        1.250 - 1.500 kWh m²<br>
                     </div>
                     <div style="margin-bottom: 5px;">
                         <i style="background:#FFFF73; width: 20px; height: 20px; float: left; margin-right: 8px;"></i>
-                        1.000 - 1.250<br>
+                        1.000 - 1.250 kWh m²<br>
                     </div>
                     <div style="margin-bottom: 5px;">
                         <i style="background:#B4FD77; width: 20px; height: 20px; float: left; margin-right: 8px;"></i>
-                        750 - 1.000<br>
+                        750 - 1.000 kWh m²<br>
                     </div>
                     <div style="margin-bottom: 5px;">
                         <i style="background:#89F0CC; width: 20px; height: 20px; float: left; margin-right: 8px;"></i>
-                        500 - 750<br>
+                        500 - 750 kWh m²<br>
                     </div>
                     <div style="margin-bottom: 5px;">
                         <i style="background:#3ACEFE; width: 20px; height: 20px; float: left; margin-right: 8px;"></i>
-                        250 - 500<br>
+                        250 - 500 kWh m²<br>
                     </div>
                     <div style="margin-bottom: 5px;">
                         <i style="background:#6B73FD; width: 20px; height: 20px; float: left; margin-right: 8px;"></i>
-                        0 - 250<br>
+                        0 - 250 kWh m²<br>
                     </div>
                 </details>
                 
